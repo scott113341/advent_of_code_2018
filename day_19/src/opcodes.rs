@@ -22,13 +22,56 @@ impl<'a> Program<'a> {
             return false;
         }
 
-        // Run the instruction and increment the register
-        let registers_pre = self.registers.clone();
+        if instruction_index == 4 && self.registers[2] * self.registers[3] == self.registers[5] {
+            let r = self.registers;
+            println!("{:10}  {:10}  {:10}  {:10}  {:10}  {:10}", r[0], r[1], r[2], r[3], r[4], r[5]);
+        }
 
         let instruction = *instruction.unwrap();
         self.exec(&instruction);
         self.registers[self.ip_register] += 1;
-        // println!("{} - {:?} - {:?} => {:?}", instruction_index, instruction, registers_pre, self.registers);
+        true
+    }
+
+    pub fn exec_next_optimized(&mut self) -> bool {
+        let instruction_index = self.registers[self.ip_register];
+        let instruction = self.instructions.get(instruction_index);
+
+        // Guard against out-of-bounds instruction index
+        if instruction.is_none() {
+            return false;
+        }
+
+        // This is a result of inspecting instructions 3-11 and figuring out what they do: find the
+        // divisors of 10551339 (stored in r[5]) and sum them up in r[0]. Once that's done, it sets
+        // r[4] (the instruction pointer) to 11. I figured this out by looking at what the value of
+        // all registers were during normal ::exec_next execution when "eqrr 1 5 1" was true.
+        if instruction_index == 3 {
+            let r = &mut self.registers;
+
+            // Set r[2] to our target
+            r[2] = r[5];
+
+            // Decrement r[2] down to 1
+            while r[2] >= 1 {
+                // If r[2] is a divisor of target, add it to r[0] and save multiplier to r[3]
+                if r[5] % r[2] == 0 {
+                    r[3] = r[5] / r[2];
+                    r[0] += r[3];
+                    println!("{:10}  {:10}  {:10}  {:10}  {:10}  {:10}", r[0], r[1], r[2], r[3], r[4], r[5]);
+                }
+
+                r[2] -= 1;
+            }
+
+            r[self.ip_register] = 11;
+        } else {
+            let instruction = *instruction.unwrap();
+            self.exec(&instruction);
+        }
+
+        self.registers[self.ip_register] += 1;
+
         true
     }
 

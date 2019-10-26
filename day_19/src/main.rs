@@ -1,5 +1,3 @@
-#![feature(dbg_macro)]
-
 mod opcodes;
 
 use crate::opcodes::{Instruction, Instructions, IpRegister, Program};
@@ -18,7 +16,7 @@ fn register_0_result(input: &Vec<&str>) -> usize {
     let (ip_register, instructions) = parse_input(input);
     let mut program = Program::new(ip_register, instructions);
 
-    // Return the 0th register until exec_next returns false (program terminates)
+    // Return the 0th register once exec_next returns false (program terminates)
     loop {
         if program.exec_next() == false {
             return program.registers[0];
@@ -35,9 +33,9 @@ fn register_0_result_different_start(input: &Vec<&str>) -> usize {
     // Mutate the 0th register
     program.registers[0] = 1;
 
-    // Return the 0th register until exec_next returns false (program terminates)
+    // Return the 0th register once exec_next returns false (program terminates)
     loop {
-        if program.exec_next() == false {
+        if program.exec_next_optimized() == false {
             return program.registers[0];
         }
     }
