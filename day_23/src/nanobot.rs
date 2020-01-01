@@ -1,6 +1,13 @@
 use regex::Regex;
 
-#[derive(Eq, PartialEq, Copy, Clone, Debug)]
+#[derive(Hash, Eq, PartialEq, Copy, Clone, Debug)]
+pub struct Point {
+    pub x: isize,
+    pub y: isize,
+    pub z: isize,
+}
+
+#[derive(Hash, Eq, PartialEq, Copy, Clone, Debug)]
 pub struct Nanobot {
     pub x: isize,
     pub y: isize,
@@ -28,6 +35,16 @@ impl Nanobot {
             (nanobot.z - self.z).abs()
         );
         distance <= self.r
+    }
+
+    pub fn points_in_range(&self) {
+        for x in 0..=self.r {
+            for y in 0..=self.r {
+                for z in 0..=self.r {
+
+                }
+            }
+        }
     }
 }
 
